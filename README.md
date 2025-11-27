@@ -1,2 +1,2 @@
 # NBC_CH_4_PoliceAndThieves
-CH4 Personal Project Repository - Implement 'Police and Thieves' Game
+CH4 Personal Project Repository - Implement 'Police and Thieves(Cops and Robbers)' Game
