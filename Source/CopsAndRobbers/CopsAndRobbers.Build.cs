@@ -8,6 +8,18 @@ public class CopsAndRobbers : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-	}
+		PublicDependencyModuleNames.AddRange(new string[]
+		{ 
+			// Intial Dependency
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
+
+			// UI	
+			"UMG", "Slate", "SlateCore",
+        });
+
+        PublicIncludePaths.AddRange(new string[]
+        {
+            "CobsAndRobbers", // 헤더 Include 시, 경로 탐색용
+		});
+    }
 }
