@@ -14,4 +14,14 @@ class COPSANDROBBERS_API ACRGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+#pragma region AGameStateBase Override
+
+public:
+	ACRGameStateBase();
+
+	virtual void HandleBeginPlay() override;
+
+	virtual void OnRep_ReplicatedHasBegunPlay() override;
+
+#pragma endregion
 };

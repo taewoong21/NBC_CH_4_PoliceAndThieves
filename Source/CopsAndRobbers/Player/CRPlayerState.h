@@ -3,16 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerController.h"
-#include "CRPlayerController.generated.h"
+#include "GameFramework/PlayerState.h"
+#include "CRPlayerState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class COPSANDROBBERS_API ACRPlayerController : public APlayerController
+class COPSANDROBBERS_API ACRPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
-
 };

@@ -2,4 +2,7 @@
 
 
 #include "Game/CRGameModeBase.h"
+#include "CRGameModeBase.h"
+#include "CopsAndRobbers.h"
+
 

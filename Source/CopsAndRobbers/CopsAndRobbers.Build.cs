@@ -19,7 +19,7 @@ public class CopsAndRobbers : ModuleRules
 
         PublicIncludePaths.AddRange(new string[]
         {
-            "CobsAndRobbers", // 헤더 Include 시, 경로 탐색용
+            "CopsAndRobbers", // 헤더 Include 시, 경로 탐색용
 		});
     }
 }
