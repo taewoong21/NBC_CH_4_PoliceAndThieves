@@ -14,15 +14,13 @@ class COPSANDROBBERS_API ATitlePlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	ATitlePlayerController();
-
-protected:
 	virtual void BeginPlay() override;
 
+	void JoinServer(const FString& InIPAddress);
 private:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UTitleScreenWidget> TitleWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = ASUIPlayerController, Meta = (AllowPrivateAccess))
+	TSubclassOf<UUserWidget> UIWidgetClass;
 
-	UPROPERTY()
-	UTitleScreenWidget* TitleWidgetInstance;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = ASUIPlayerController, Meta = (AllowPrivateAccess))
+	TObjectPtr<UUserWidget> UIWidgetInstance;
 };

@@ -6,6 +6,15 @@
 #include "GameFramework/GameStateBase.h"
 #include "CRGameStateBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EMatchState : uint8
+{
+	None,
+	Waiting,
+	Playing,
+	Ending,
+	End
+};
 /**
  * 
  */
@@ -23,5 +32,14 @@ public:
 
 	virtual void OnRep_ReplicatedHasBegunPlay() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 #pragma endregion
+
+public:
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
+	int32 AlivePlayerControllerCount = 0;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
+	EMatchState MatchState = EMatchState::Waiting;
 };

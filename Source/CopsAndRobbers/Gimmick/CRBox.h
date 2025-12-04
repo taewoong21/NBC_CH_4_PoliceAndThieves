@@ -24,7 +24,14 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
+
+
 #pragma endregion
+
+private:
+	UFUNCTION()
+	void OnRep_ServerRotationYaw();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -33,18 +40,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
-	
-	// UPROPERTY(Replicated)
 	UPROPERTY(ReplicatedUsing = OnRep_ServerRotationYaw)
 	float ServerRotationYaw;
 
 	float RotationSpeed;
 
-	// float NetUpdatePeriod;
+	float NetUpdatePeriod;
 
-	// float AccDeltaSecondSinceReplicated;
-	
-private:
-	UFUNCTION()
-	void OnRep_ServerRotationYaw();
+	float AccDeltaSecondSinceReplicated;
+
+	float NetCullDistance;
 };
