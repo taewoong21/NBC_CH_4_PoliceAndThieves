@@ -14,6 +14,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/CRPlayerController.h"
+#include "Player/CRPlayerState.h" 
 #include "Game/CRGameModeBase.h"
 #include "Game/CRGameStateBase.h"
 #include "Gimmick/CRLandMine.h"
@@ -29,6 +30,7 @@
 ACRCharacter::ACRCharacter() : bCanAttack(true), MeleeAttackMontagePlayTime(0.f), LastStartMeleeAttackTime(0.f), MeleeAttackTimeDifference(0.f), MinAllowedTimeForMeleeAttack(0.02f)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -36,7 +38,8 @@ ACRCharacter::ACRCharacter() : bCanAttack(true), MeleeAttackMontagePlayTime(0.f)
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+	GetCharacterMovement()->SetIsReplicated(true);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->TargetArmLength = 400.f;
@@ -60,7 +63,6 @@ ACRCharacter::ACRCharacter() : bCanAttack(true), MeleeAttackMontagePlayTime(0.f)
 	StatusComponent->OnOutOfCurrentHP.AddUObject(this, &ThisClass::OnDeath);
 }
 
-
 void ACRCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,12 +70,17 @@ void ACRCharacter::BeginPlay()
 	if (IsLocallyControlled() == true)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
-		checkf(IsValid(PC) == true, TEXT("PlayerController is invalid."));
 
-		UEnhancedInputLocalPlayerSubsystem* EILPS = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-		checkf(IsValid(EILPS) == true, TEXT("EnhancedInputLocalPlayerSubsystem is invalid."));
+		// PC가 유효한 경우(Player Character)
+		if (IsValid(PC))
+		{
+			UEnhancedInputLocalPlayerSubsystem* EILPS = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 
-		EILPS->AddMappingContext(InputMappingContext, 0);
+			if (IsValid(EILPS))
+			{
+				EILPS->AddMappingContext(InputMappingContext, 0);
+			}
+		}
 	}
 
 	if (IsValid(MeleeAttackMontage) == true)
@@ -81,8 +88,6 @@ void ACRCharacter::BeginPlay()
 		MeleeAttackMontagePlayTime = MeleeAttackMontage->GetPlayLength();
 	}
 }
-
-
 
 void ACRCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -289,11 +294,38 @@ bool ACRCharacter::ServerRPCMeleeAttack_Validate(float InStartMeleeAttackTime)
 
 void ACRCharacter::ServerRPCPerformMeleeHit_Implementation(ACharacter* InDamagedCharacters, float InCheckTime)
 {
-	if (IsValid(InDamagedCharacters) == true)
+	if (!IsValid(InDamagedCharacters)) return;
+	
+	ACRGameModeBase* GM = Cast<ACRGameModeBase>(GetWorld()->GetAuthGameMode());
+	ACRPlayerState* PS = GetPlayerState<ACRPlayerState>();
+	ACRPlayerState* TargetPS = InDamagedCharacters->GetPlayerState<ACRPlayerState>();
+
+	// 대기(Waiting)중이면 무시
+	ACRGameStateBase* GS = GetWorld()->GetGameState<ACRGameStateBase>();
+	if (!GS || GS->MatchState != EMatchState::Playing) return;
+
+	if (GM && PS && TargetPS)
 	{
-		const float MeleeAttackDamage = 10.f;
-		FDamageEvent DamageEvent;
-		InDamagedCharacters->TakeDamage(MeleeAttackDamage, DamageEvent, GetController(), this);
+		// 공격자가 경찰인 경우
+		if (PS->GetTeamRole() == ETeamRole::Police)
+		{
+			if (TargetPS->GetTeamRole() == ETeamRole::Thief)
+			{
+				// 도둑 검거 -> 경찰 승리
+				GM->EndGameWithWinner(ETeamRole::Police);
+
+				MulticastRPCMeleeAttack();
+			}
+			else if (TargetPS->GetTeamRole() == ETeamRole::Civilian)
+			{
+				// 시민 공격 시, 패널티 - 경찰 본인 데미지 
+				FDamageEvent DamageEvent;
+				this->TakeDamage(40.0f, DamageEvent, GetController(), this);
+
+				InDamagedCharacters->Destroy();
+			}
+		}
+		// 도둑끼리 혹은 시민이 때리는 경우는 데미지 X
 	}
 }
 

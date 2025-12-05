@@ -7,9 +7,9 @@
 #include "CRGameModeBase.generated.h"
 
 class ACRPlayerController;
-/**
- * 
- */
+
+enum class ETeamRole : uint8;
+
 UCLASS()
 class COPSANDROBBERS_API ACRGameModeBase : public AGameModeBase
 {
@@ -24,14 +24,22 @@ public:
 
 	void OnCharacterDead(ACRPlayerController* InController);
 
+	void EndGameWithWinner(ETeamRole WinnerRole);
+
 private:
 	UFUNCTION()
 	void OnMainTimerElapsed();
 
 	void NotifyToAllPlayer(const FString& NotificationString);
 
+	void AssignRolesToPlayers();
+
+	void OnTimeLimitExpired();
+
 public:
 	FTimerHandle MainTimerHandle;
+
+	FTimerHandle GameEndTimerHandle;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

@@ -41,5 +41,8 @@ public:
 	int32 AlivePlayerControllerCount = 0;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
+	int32 RemainingGameTime = 0;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	EMatchState MatchState = EMatchState::Waiting;
 };

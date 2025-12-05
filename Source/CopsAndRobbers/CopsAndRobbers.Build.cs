@@ -15,6 +15,9 @@ public class CopsAndRobbers : ModuleRules
 
 			// UI	
 			"UMG", "Slate", "SlateCore",
+
+			// AI
+			"AIModule", "NavigationSystem",
         });
 
         PublicIncludePaths.AddRange(new string[]

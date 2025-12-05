@@ -33,6 +33,9 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	FText NotificationText;
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	FText RoleText;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UUserWidget> NotificationTextUIClass;
 

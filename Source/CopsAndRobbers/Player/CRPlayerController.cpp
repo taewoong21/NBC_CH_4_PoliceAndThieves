@@ -40,6 +40,7 @@ void ACRPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, NotificationText);
+	DOREPLIFETIME(ThisClass, RoleText);
 }
 
 void ACRPlayerController::OnCharacterDead()
